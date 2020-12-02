@@ -10,6 +10,7 @@ from model.model import CovidNet
 from model.model_Grad_CAM import CovidNet_Grad_CAM
 from model.model_chinese import CovidNet_ResNet50
 from model.densenet import NewDenseNet, myDenseNet_v2
+from model.model_Deep_Explainer import CovidNet_DE
 import csv
 import numpy as np
 
@@ -150,8 +151,6 @@ def read_filepaths(file):
         print('Clase={}-Samples={}'.format(i, np.sum(labes_array == i)))
     return paths, labels
 
-
-
 def select_model(args):
     if args.model == 'COVIDNet':
         return CovidNet(args.classes)
@@ -161,6 +160,8 @@ def select_model(args):
         return NewDenseNet(args.classes)#myDenseNet_v2(args.classes)
     elif args.model == 'CovidNet_Grad_CAM':
         return CovidNet_Grad_CAM(args.classes)
+    elif args.model == 'CovidNet_DE':
+        return CovidNet_DE(args.classes)
 
 
 def select_optimizer(args, model):

@@ -5,10 +5,14 @@ import glob
 import numpy as np
 import random as ra
 from utils import read_filepaths
-from PIL import Image
+from PIL import Image, ImageOps
+import cv2
+from matplotlib import cm
 from torchvision import transforms
 from batchgenerators.transforms import noise_transforms
 from batchgenerators.transforms import spatial_transforms
+from skimage.exposure import equalize_hist
+from skimage.util import random_noise
 
 COVIDxDICT = {'pneumonia': 0, 'normal': 1, 'COVID-19': 2}
 
@@ -46,13 +50,13 @@ class COVIDxDataset(Dataset):
     """
 
     def __init__(self, mode, n_classes=3, dataset_path='./datasets', dim=(224, 224)):
-        self.root = str(dataset_path) + '/' + mode + '/'
+        self.root = str(dataset_path) #+ '/' + mode + '/'
 
         self.CLASSES = n_classes
         self.dim = dim
         self.COVIDxDICT = {'pneumonia': 0, 'normal': 1, 'COVID-19': 2}
-        testfile = '/home/julian/Documents/PythonExperiments/COVIDNet/test_split_v2.txt'#'/home/julian/Documents/PythonExperiments/COVID-Net/test_split_v2.txt'#'./test_split_v2.txt'
-        trainfile = '/home/julian/Documents/PythonExperiments/COVIDNet/train_split_v2.txt'#'/home/julian/Documents/PythonExperiments/COVID-Net/train_split_v2.txt'#'./train_split_v2.txt'
+        testfile = '/home/julian/Documents/PythonExperiments/COVIDNet/Datos/DatosExperimentos_3/test_split_fold_4.txt'#'/home/julian/Documents/PythonExperiments/COVID-Net/test_split_v2.txt'#'./test_split_v2.txt'
+        trainfile = '/home/julian/Documents/PythonExperiments/COVIDNet/Datos/DatosExperimentos_3/train_split_fold_4.txt'#'/home/julian/Documents/PythonExperiments/COVID-Net/train_split_v2.txt'#'./train_split_v2.txt'
         if (mode == 'train'):
             self.paths, self.labels = read_filepaths(trainfile)
         elif (mode == 'test'):
@@ -66,22 +70,23 @@ class COVIDxDataset(Dataset):
 
     def __getitem__(self, index):
         #index = int(index/2)
-        image_tensor = self.load_image(self.root + self.paths[index], self.dim, augmentation=self.mode)
+        image_tensor = self.load_image(self.root + self.paths[index], self.dim)
         label_tensor = torch.tensor(self.COVIDxDICT[self.labels[index]], dtype=torch.long)
         image_tensor = image_tensor.numpy()
+
         if ra.random()>0.5:
-            image_tensor = noise_transforms.augment_gaussian_noise(image_tensor, noise_variance=(0.015, 0.015))
-        
-        if (label_tensor.numpy() == 2 or label_tensor.numpy() ==0) and self.mode == 'train':#solo data augmentation en COVID  :if label_tensor.numpy() == 2  and self.mode == 'train'
-            if ra.random()>0.3:
+            image_tensor = random_noise(image_tensor, mode='gaussian', mean=0.015, var = 0.015)
+            
+        if ((label_tensor.numpy() == 2 and ra.random()>0.17) or (label_tensor.numpy() ==0 and ra.random()>0.5)) and self.mode == 'train':#solo data augmentation en COVID  :if label_tensor.numpy() == 2  and self.mode == 'train'
+            #if ra.random()>0.3:
                 #print('Entro')
-                augmented_tensor = do_augmentation(image_tensor)
-                augmented_tensor = torch.from_numpy(augmented_tensor)
-                augmented_tensor = torch.squeeze(augmented_tensor, dim=0)
+            augmented_tensor = do_augmentation(image_tensor)
+            augmented_tensor = torch.from_numpy(augmented_tensor)
+            augmented_tensor = torch.squeeze(augmented_tensor, dim=0)
                 #print(augmented_tensor.shape)
                 #print(label_tensor.numpy())
                 #final_tensor = torch.cat((image_tensor.unsqueeze(0), augmented_tensor.unsqueeze(0)), 0) 
-                final_tensor = augmented_tensor
+            final_tensor = augmented_tensor
                 #print(final_tensor.min())
                 #label_tensor = torch.stack((label_tensor, label_tensor),0)
                 #print(label_tensor.shape)
@@ -90,40 +95,32 @@ class COVIDxDataset(Dataset):
                                      #std=[0.229, 0.224, 0.225])#because we are using pretrained resnet50
 
                 #final_tensor = norm(final_tensor)
-            else:
-                final_tensor = torch.FloatTensor(image_tensor)
+            #else:
+            #    final_tensor = torch.FloatTensor(image_tensor)
         else:
             final_tensor = torch.FloatTensor(image_tensor)
         return final_tensor, label_tensor
 
-    def load_image(self, img_path, dim, augmentation='test'):
+    def load_image(self, img_path, dim):
         if not os.path.exists(img_path):
             print("IMAGE DOES NOT EXIST {}".format(img_path))
-        image = Image.open(img_path).convert('RGB')
-        #image = np.array(image)
-        #image = image.astype('float32') / np.max(image)
-        #print(image)
-        #image = image.resize(dim).convert('RGB')
-        
+        image = cv2.imread(img_path)
+        image2 = np.copy(image)
+        image2[image2>0]=255
+        image2 = image2[:,:,0]
+        mask = Image.fromarray(image2.astype('uint8'))
+  
+        img_adapteq = Image.fromarray(image.astype('uint8'), 'RGB')
+        img_adapteq = ImageOps.equalize(img_adapteq,mask=mask)
 
         preprocess = transforms.Compose([
-            transforms.Resize(256),
+            transforms.Resize(224),
             transforms.CenterCrop(224),
             transforms.ToTensor(),#normaliza a [0,1]
             transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
             ])
-        image_tensor = preprocess(image)
+        image_tensor = preprocess(img_adapteq)
         
-
-        #t = transforms.ToTensor()
-
-        #norm = transforms.Normalize(mean=[0.5, 0.5, 0.5],
-        #                             std=[1, 1, 1])
-        #norm = transforms.Normalize(mean=[0.485, 0.456, 0.406],
-        #                             std=[0.229, 0.224, 0.225])#because we are using pretrained resnet50
-
-        #image_tensor = norm(t(image))
-
         return image_tensor
 
 

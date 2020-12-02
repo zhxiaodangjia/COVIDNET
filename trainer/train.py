@@ -2,7 +2,7 @@ import torch
 import os
 import torch.nn as nn
 import numpy as np
-from sklearn.utils.class_weight import compute_class_weight
+from sklearn.utils.class_weight import compute_class_weight, compute_sample_weight
 from model.loss import focal_loss, crossentropy_loss
 from utils.util import Metrics, print_stats, print_summary, select_model, select_optimizer, load_model
 from model.metric import accuracy, top_k_acc
@@ -26,12 +26,15 @@ def initialize(args):
     #print(train_loader.)
     #------ Class weigths for sampling and for loss function -----------------------------------
     labels = np.unique(train_loader.labels)
-    #print(labels)
+    print(labels)
     class_weight = compute_class_weight('balanced', labels, train_loader.labels)
+    #weights_sample = compute_sample_weight('balanced',train_loader.labels)
+    #print(np.unique(weights_sample))
+    #---------- Alphabetical order in labels does not correspond to class order in COVIDxDataset-----
     class_weight = class_weight[::-1]
-    #class_weight[2]=50
-    #weights = torch.DoubleTensor(class_weight.copy())
-    #sampler = torch.utils.data.sampler.WeightedRandomSampler(weights, len(train_loader.labels))
+    #---------------------------------------------------------------------------------
+    #weights_sample = torch.DoubleTensor(weights_sample)                                       
+    #sampler = torch.utils.data.sampler.WeightedRandomSampler(weights_sample, len(weights_sample))                       
     if (args.cuda):
         class_weight = torch.from_numpy(class_weight.astype(float)).cuda()
     else:
@@ -44,8 +47,9 @@ def initialize(args):
     train_params = {'batch_size': args.batch_size,
                     'shuffle': True,
                     'num_workers': 4}#'sampler' : sampler
+    
     test_params = {'batch_size': args.batch_size,
-                   'shuffle': False,
+                   'shuffle': True,
                    'num_workers': 4}
     #------------------------------------------------------------------------------------------
     training_generator = DataLoader(train_loader, **train_params)

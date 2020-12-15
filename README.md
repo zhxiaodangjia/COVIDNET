@@ -7,6 +7,7 @@ The models available are:
 - Original CovidNet
 - Modified CovidNet with dropout and Grad_CAM functionalities
 - CovidNet with Deep Explainer functionalities
+- Covid_Resnet50
 - DenseNet
 
 The preprocessing steps evaluated include cropping and segmentation of the lungs based on the 2D Lung segmentation available at [GitHub](https://github.com/imlab-uiip/lung-segmentation-2d). This network is also included in the segmenter directory of this respository. The description of all the experiments and results can be consulted on:

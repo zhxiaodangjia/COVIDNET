@@ -8,7 +8,7 @@ import torch.optim as optim
 import pandas as pd
 from model.model import CovidNet
 from model.model_Grad_CAM import CovidNet_Grad_CAM
-from model.model_chinese import CovidNet_ResNet50
+from model.model_CovidNet_ResNet50 import CovidNet_ResNet50
 from model.densenet import NewDenseNet, myDenseNet_v2
 from model.model_Deep_Explainer import CovidNet_DE
 import csv

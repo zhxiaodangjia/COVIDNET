@@ -17,13 +17,8 @@ from skimage.util import random_noise
 COVIDxDICT = {'pneumonia': 0, 'normal': 1, 'COVID-19': 2}
 
 def do_augmentation(image_tensor):
-    #Ya tiene incorporado el random 
-    array, _ = spatial_transforms.augment_mirroring(image_tensor, axes=(1, 2))
     
-    #if ra.random()>0.5:
-    #    array = noise_transforms.augment_gaussian_noise(array, noise_variance=(0.015, 0.015))
-    #else:
-    #    array = array
+    array, _ = spatial_transforms.augment_mirroring(image_tensor, axes=(1, 2))
         
     # need to become [bs, c, x, y] before augment_spatial
     augmented = array[None, ...]
@@ -65,9 +60,9 @@ class COVIDxDataset(Dataset):
         self.mode = mode
 
     def __len__(self):
-        #print(len(self.paths)+ np.sum(np.array(self.labels)=='COVID-19'))
-        return len(self.paths)#*2 #+ np.sum(np.array(self.labels)=='COVID-19')#*2 double the size
-
+        
+        return len(self.paths)
+    
     def __getitem__(self, index):
         #index = int(index/2)
         image_tensor = self.load_image(self.root + self.paths[index], self.dim)
@@ -77,26 +72,15 @@ class COVIDxDataset(Dataset):
         if ra.random()>0.5:
             image_tensor = random_noise(image_tensor, mode='gaussian', mean=0.015, var = 0.015)
             
-        if ((label_tensor.numpy() == 2 and ra.random()>0.17) or (label_tensor.numpy() ==0 and ra.random()>0.5)) and self.mode == 'train':#solo data augmentation en COVID  :if label_tensor.numpy() == 2  and self.mode == 'train'
-            #if ra.random()>0.3:
-                #print('Entro')
+        if ((label_tensor.numpy() == 2 and ra.random()>0.17) or (label_tensor.numpy() ==0 and ra.random()>0.5)) and self.mode == 'train':
+            
+
             augmented_tensor = do_augmentation(image_tensor)
             augmented_tensor = torch.from_numpy(augmented_tensor)
             augmented_tensor = torch.squeeze(augmented_tensor, dim=0)
-                #print(augmented_tensor.shape)
-                #print(label_tensor.numpy())
-                #final_tensor = torch.cat((image_tensor.unsqueeze(0), augmented_tensor.unsqueeze(0)), 0) 
+              
             final_tensor = augmented_tensor
-                #print(final_tensor.min())
-                #label_tensor = torch.stack((label_tensor, label_tensor),0)
-                #print(label_tensor.shape)
-                #---------------------------------------------------------------------------------------------
-                #norm = transforms.Normalize(mean=[0.485, 0.456, 0.406],
-                                     #std=[0.229, 0.224, 0.225])#because we are using pretrained resnet50
-
-                #final_tensor = norm(final_tensor)
-            #else:
-            #    final_tensor = torch.FloatTensor(image_tensor)
+                
         else:
             final_tensor = torch.FloatTensor(image_tensor)
         return final_tensor, label_tensor

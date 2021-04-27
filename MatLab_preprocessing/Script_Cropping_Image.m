@@ -1,20 +1,20 @@
-%sDirOrigi = '/home/julian/Documents/PythonExperiments/COVIDNet/Datos/DatosExperimentos_3/OrgImages/';
-%sDirSegmented = '/home/julian/Documents/PythonExperiments/COVIDNet/Datos/DatosExperimentos_3/OrgImagesSegmented/';
-%sDirOut1 = '/home/julian/Documents/PythonExperiments/COVIDNet/Datos/DatosExperimentos_3/CroppedImages/';
-%sDirOut2 = '/home/julian/Documents/PythonExperiments/COVIDNet/Datos/DatosExperimentos_3/CroppedSegmentedImages/';
-%if ~exist(sDirOut1,'dir')
-%    mkdir(sDirOut1);
-%end
-%if ~exist(sDirOut2,'dir')
-%    mkdir(sDirOut2);
-%end
+sDirOrigi = '/COVIDNet/Data/OrgImages/';
+sDirSegmented = '/COVIDNet/Data/OrgImagesSegmented/';
+sDirOut1 = '/COVIDNet/Data/CroppedImages/';
+sDirOut2 = '/COVIDNet/Data/CroppedSegmentedImages/';
+if ~exist(sDirOut1,'dir')
+    mkdir(sDirOut1);
+end
+if ~exist(sDirOut2,'dir')
+    mkdir(sDirOut2);
+end
 
-%eImages = dir(sDirOrigi);%No se puede buscar una extensión en particular porque se tienen varios formatos de imagen
-%iNImages = length(eImages);
+eImages = dir(sDirOrigi);%There are different data formats
+iNImages = length(eImages);
 
 
 
-for i = 3:30787%30788:iNImages
+for i = 3:iNImages
     sFileOrigen = strcat(sDirOrigi,eImages(i).name);
     mImageOrg=imread( sFileOrigen );
     [h,w,c] = size(mImageOrg);
@@ -31,7 +31,7 @@ for i = 3:30787%30788:iNImages
     mImageOrg = im2uint16(mImageOrg);
     
     %---------------------------------------------------------
-    %---------- Leemos la imagen segmentada ------------------
+    %---------- Load segmented image ------------------
     try
         sFileSegmented = strcat(sDirSegmented,eImages(i).name);
         mImageSeg=imread( sFileSegmented );
@@ -41,19 +41,18 @@ for i = 3:30787%30788:iNImages
             mImageSeg = rgb2gray(mImageSeg);
         end
         mImageSeg = im2uint16(mImageSeg);
-        %----------- Aplicamos la máscara a la imagen original --------
+        %----------- Apply mask to the original images --------
         se = offsetstrel('ball',5,5);
         mErodedImageSeg = imerode(mImageSeg,se);%erosion
         mErodedImageSeg(mErodedImageSeg~=0)=1;
         mImageNew2 = mImageOrg.*mErodedImageSeg; %CroppedSegmented
         mImageNew1 = mImageOrg;%cropped
-        %----------- Encontramos bordes ----------------------------
+        %----------- Boundaries ----------------------------
         vRows = sum(mErodedImageSeg)/h;
         vColumns = sum(mErodedImageSeg,2)/w;
         vIndW = find(vRows>0);
         vIndH = find(vColumns>0);
-        %----------- Construimos la imágen recortada y la recortada con
-        %máscara
+        %----------- Build cropped and cropped-segmented images -----
         mImageNew1 = mImageNew1(vIndH(1):vIndH(end),vIndW(1):vIndW(end));
         mImageNew1 = uint16(65536 * mat2gray( mImageNew1 ));
         
@@ -68,6 +67,6 @@ for i = 3:30787%30788:iNImages
         sFilePNGDestino2 = strcat(sDirOut2,sName,'.png');
         imwrite(mImageNew2, sFilePNGDestino2, 'png' );
     catch
-        error('Imagen lateral no procesada');
+        error('Not processed image');
     end
 end

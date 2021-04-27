@@ -55,8 +55,8 @@ class COVIDxDataset(Dataset):
         self.CLASSES = n_classes
         self.dim = dim
         self.COVIDxDICT = {'pneumonia': 0, 'normal': 1, 'COVID-19': 2}
-        testfile = '/home/julian/Documents/PythonExperiments/COVIDNet/Datos/DatosExperimentos_3/test_split_fold_4.txt'#'/home/julian/Documents/PythonExperiments/COVID-Net/test_split_v2.txt'#'./test_split_v2.txt'
-        trainfile = '/home/julian/Documents/PythonExperiments/COVIDNet/Datos/DatosExperimentos_3/train_split_fold_4.txt'#'/home/julian/Documents/PythonExperiments/COVID-Net/train_split_v2.txt'#'./train_split_v2.txt'
+        testfile = 'test_split_fold_0.txt'
+        trainfile = 'train_split_fold_0.txt'
         if (mode == 'train'):
             self.paths, self.labels = read_filepaths(trainfile)
         elif (mode == 'test'):

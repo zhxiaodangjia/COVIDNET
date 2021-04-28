@@ -12,7 +12,7 @@ The models available are:
 
 The preprocessing steps evaluated include cropping and segmentation of the lungs based on the 2D Lung segmentation available at [GitHub](https://github.com/imlab-uiip/lung-segmentation-2d). This network is also included in the segmenter directory of this respository. The description of all the experiments and results can be consulted on:
 
-J.D. Arias-Londoño, J.A. Gómez-García, L. Moro-Velázquez, J.I. Godino-Llorente. Artificial Intelligence applied to chest X-Ray images for the automatic detection of COVID-19. A thoughtful evaluation approach. In press IEEE Access, 2020. [Open access](https://ieeexplore.ieee.org/document/9293268)
+J.D. Arias-Londoño, J.A. Gómez-García, L. Moro-Velázquez, J.I. Godino-Llorente. Artificial Intelligence applied to chest X-Ray images for the automatic detection of COVID-19. A thoughtful evaluation approach. IEEE Access, vol 8. 2020. [Open access](https://ieeexplore.ieee.org/document/9293268)
 
 If you find our work useful, can cite our paper using:
 
@@ -20,7 +20,8 @@ If you find our work useful, can cite our paper using:
 @article{arias2020,
   title={Artificial Intelligence applied to chest X-Ray images for the automatic detection of COVID-19. A thoughtful evaluation approach},
   author={Arias-Londo{\~n}o, Julian D and Gomez-Garcia, Jorge A and Moro-Velazquez, Laureano and Godino-Llorente, Juan I},
-  journal={In Press IEEE Access},
+  journal={IEEE Access},
+  volume = {8},
   year={2020}
 }
 ```

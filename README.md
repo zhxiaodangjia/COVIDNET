@@ -27,7 +27,7 @@ If you find our work useful, can cite our paper using:
 
 To execute the code take into account the following steps:
 
-- Build train.txt and test.txt files according to the structure proposed in the original implementation, which include the name of every file with its corresponding label ['pneumonia', 'normal', 'COVID-19'].
+- Build the train.txt and test.txt files according to the structure proposed in the original implementation, which include the name of every file with its corresponding label ['pneumonia', 'normal', 'COVID-19'].
 - The path to those files must be set in dataset.py file
 - To reproduce experiment 1 of the paper run main.py with the original images
 - To reproduce experiments 2 and 3, you can use LungSegmentation notebook to apply the Segmenter CNN to the dataset and get a segmentation mask for every single image in the dataset.

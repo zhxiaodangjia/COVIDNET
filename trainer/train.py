@@ -27,7 +27,9 @@ def initialize(args):
     #------ Class weigths for sampling and for loss function -----------------------------------
     labels = np.unique(train_loader.labels)
     print(labels)
-    class_weight = compute_class_weight('balanced', labels, train_loader.labels)
+    class_weight = compute_class_weight( class_weight='balanced',
+    classes=labels,            # 所有类别
+    y=train_loader.labels  )
     #weights_sample = compute_sample_weight('balanced',train_loader.labels)
     #print(np.unique(weights_sample))
     #---------- Alphabetical order in labels does not correspond to class order in COVIDxDataset-----

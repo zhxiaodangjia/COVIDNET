@@ -70,11 +70,11 @@ def get_arguments():
                         choices=('COVIDNet','CovidNet_ResNet50', 'CovidNet_DenseNet', 'CovidNet_Grad_CAM','CovidNet_DE'))
     parser.add_argument('--opt', type=str, default='adam',
                         choices=('sgd', 'adam', 'rmsprop'))
-    parser.add_argument('--dataset', type=str, default='/content/covid-chestxray-dataset/data',
+    parser.add_argument('--dataset', type=str, default='/home/huaxu@gaps_domain.ssr.upm.es/COVID/COVIDNET/data',
                         help='path to dataset ')
-    parser.add_argument('--saved_model', type=str, default='/home/julian/Documents/PythonExperiments/COVIDNet/ModelSavedCoviNet/COVIDNet20200406_0412/COVIDNet_best_checkpoint.pth.tar',
+    parser.add_argument('--saved_model', type=str, default='/home/huaxu@gaps_domain.ssr.upm.es/COVID/COVIDNET/modelsave',
                         help='path to save_model ')
-    parser.add_argument('--save', type=str, default='/home/julian/Documents/PythonExperiments/COVIDNet/ModelSavedCoviNet/COVIDNet' + util.datestr(),
+    parser.add_argument('--save', type=str, default='/home/huaxu@gaps_domain.ssr.upm.es/COVID/COVIDNET/checkpoint' + util.datestr(),
                         help='path to checkpoint ')
     args = parser.parse_args()
     return args

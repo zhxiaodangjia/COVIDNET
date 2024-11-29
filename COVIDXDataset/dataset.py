@@ -44,14 +44,14 @@ class COVIDxDataset(Dataset):
     Code for reading the COVIDxDataset
     """
 
-    def __init__(self, mode, n_classes=3, dataset_path='./datasets', dim=(224, 224)):
-        self.root = str(dataset_path) #+ '/' + mode + '/'
+    def __init__(self, mode, n_classes=3, dataset_path='/home/huaxu@gaps_domain.ssr.upm.es/COVID/COVIDNET/data', dim=(224, 224)):
+        self.root = os.path.join(dataset_path,mode) 
 
         self.CLASSES = n_classes
         self.dim = dim
         self.COVIDxDICT = {'pneumonia': 0, 'normal': 1, 'COVID-19': 2}
-        testfile = 'test_split_fold_0.txt'
-        trainfile = 'train_split_fold_0.txt'
+        testfile = '/home/huaxu@gaps_domain.ssr.upm.es/COVID/COVIDNET/test_COVIDx_new.txt'
+        trainfile = '/home/huaxu@gaps_domain.ssr.upm.es/COVID/COVIDNET/train_COVIDx_new.txt'
         if (mode == 'train'):
             self.paths, self.labels = read_filepaths(trainfile)
         elif (mode == 'test'):
@@ -65,7 +65,7 @@ class COVIDxDataset(Dataset):
     
     def __getitem__(self, index):
         #index = int(index/2)
-        image_tensor = self.load_image(self.root + self.paths[index], self.dim)
+        image_tensor = self.load_image(os.path.join(self.root , self.paths[index]), self.dim)
         label_tensor = torch.tensor(self.COVIDxDICT[self.labels[index]], dtype=torch.long)
         image_tensor = image_tensor.numpy()
 
